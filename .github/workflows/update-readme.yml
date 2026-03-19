@@ -25,6 +25,7 @@ jobs:
 
             function statusBadge(plugin) {
               if (plugin.status === 'archived') return '🗄️ Archived';
+              if (plugin.status === 'pending') return '⏳ Pending';
               const due = new Date(plugin.verificationDue);
               if (due < today) return '⏳ Pending';
               return '✅ Active';
@@ -39,7 +40,7 @@ jobs:
                 .sort((a, b) => a.name.localeCompare(b.name))
                 .map(p => {
                   const tags = (p.tags || []).map(t => `\`${t}\``).join(' ');
-                  return `| [${p.name}](https://github.com/${p.repo}) | ${p.description} | [@${p.author}](https://github.com/${p.author}) | ${tags} | ${statusBadge(p)} |`;
+                  return `| [${p.displayName || p.name}](https://github.com/${p.repo}) | ${p.description} | [@${p.author}](https://github.com/${p.author}) | ${tags} | ${statusBadge(p)} |`;
                 })
                 .join('\n');
 

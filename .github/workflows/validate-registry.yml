@@ -1,0 +1,58 @@
+name: Validate registry.json
+
+on:
+  pull_request:
+    branches: [main]
+    paths: ['registry.json']
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Validate registry entries
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+
+            let registry;
+            try {
+              registry = JSON.parse(fs.readFileSync('registry.json', 'utf8'));
+            } catch (e) {
+              core.setFailed(`registry.json is not valid JSON: ${e.message}`);
+              return;
+            }
+
+            const REQUIRED = ['name', 'displayName', 'description', 'author', 'repo',
+                              'marketplace', 'addedAt', 'lastVerified', 'verificationDue',
+                              'status', 'tags'];
+            const VALID_STATUSES = ['active', 'archived', 'pending'];
+
+            const errors = [];
+
+            for (const plugin of (registry.plugins ?? [])) {
+              const missing = REQUIRED.filter(f => !plugin[f] && plugin[f] !== 0);
+              if (missing.length) {
+                errors.push(`[${plugin.name ?? '?'}] Missing required fields: ${missing.join(', ')}`);
+              }
+              if (!VALID_STATUSES.includes(plugin.status)) {
+                errors.push(`[${plugin.name}] Invalid status "${plugin.status}" — must be one of: ${VALID_STATUSES.join(', ')}`);
+              }
+              if (plugin.repo && !/^[^/]+\/[^/]+$/.test(plugin.repo)) {
+                errors.push(`[${plugin.name}] "repo" must be in "owner/repo" format, got: "${plugin.repo}"`);
+              }
+              if (!Array.isArray(plugin.tags)) {
+                errors.push(`[${plugin.name}] "tags" must be an array`);
+              }
+            }
+
+            if (errors.length) {
+              core.setFailed('registry.json validation failed:\n' + errors.map(e => `  • ${e}`).join('\n'));
+            } else {
+              console.log(`✓ All ${registry.plugins?.length ?? 0} plugin entries are valid.`);
+            }

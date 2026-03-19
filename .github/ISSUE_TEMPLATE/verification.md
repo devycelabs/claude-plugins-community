@@ -1,6 +1,6 @@
 ---
-name: Plugin verification
-about: 6-month active status check for a listed plugin
+name: Plugin verification (reference only)
+about: "Reference template showing the format of automated verification issues. Do not open manually — these are created by the verification-check workflow. Placeholders like {plugin-name} will not be substituted by GitHub."
 title: "[VERIFY] {plugin-name} — active status check"
 labels: verification
 assignees: ''
@@ -16,7 +16,7 @@ Please confirm one of the following by **{deadline}** (30 days from now):
 - [ ] 🗄️ **Archive it** — the plugin is no longer maintained; please archive the GitHub repo too if applicable
 - [ ] 🔀 **Transferred** — the plugin has moved to a new repo (provide the new URL)
 
-**No response by {deadline}** will result in the plugin being automatically marked as `archived` in the registry. It will remain installable but show an archived indicator in the plugin browser.
+**No response by {deadline}** will result in the plugin being marked as `archived` in the registry by a maintainer. It will remain installable but show an archived indicator in the plugin browser.
 
 To respond, simply leave a comment on this issue.
 

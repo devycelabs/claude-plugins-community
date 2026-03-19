@@ -69,7 +69,7 @@ When your `verificationDue` date arrives:
 - A GitHub issue will be opened in this repo, tagging you
 - You have **30 days** to respond confirming the plugin is still active
 - If you respond: `lastVerified` and `verificationDue` are updated (+6 months), status stays `active`
-- If no response after 30 days: status is changed to `archived`
+- If no response after 30 days: a maintainer will open a PR to set status to `archived`
 
 **Archived plugins** remain in the registry and are still installable — they just show an `archived` indicator in the plugin browser so users know maintenance may have lapsed.
 

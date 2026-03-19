@@ -60,4 +60,17 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for full details.
 
 ---
 
+## Maintainer setup
+
+When forking or transferring this repo, create these GitHub labels before any submissions arrive — the automation depends on them:
+
+| Label | Colour | Used by |
+|-------|--------|---------|
+| `verification` | `#e4e669` | `verification-check.yml` — weekly active-status issues |
+| `submission` | `#0075ca` | Submission issue template |
+
+Create them at `github.com/<org>/<repo>/labels`.
+
+---
+
 *Maintained by [Devyce Labs](https://github.com/devycelabs) · [claude-plugin-browser](https://github.com/devycelabs/claude-plugin-browser)*

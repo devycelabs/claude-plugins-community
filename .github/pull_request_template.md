@@ -4,8 +4,9 @@
 **Repo:**
 
 ### Checklist
-- [ ] Added entry to `registry.json` with all required fields
+- [ ] Added entry to `registry.json` with all required fields (`name`, `displayName`, `description`, `author`, `repo`, `marketplace`, `addedAt`, `lastVerified`, `verificationDue`, `status`, `tags`)
 - [ ] `name` matches `.claude-plugin/plugin.json` in my repo
+- [ ] `displayName` is a human-readable version of the name (e.g. `"My Plugin"` not `"my-plugin"`)
 - [ ] `addedAt`, `lastVerified` set to today's date
 - [ ] `verificationDue` set to 6 months from today
 - [ ] `status` is `active`
