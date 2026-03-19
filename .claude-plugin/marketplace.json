@@ -1,0 +1,10 @@
+{
+  "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
+  "name": "devycelabs-claude-plugins-community",
+  "description": "Community-built Claude Code plugins — vetted, maintained, and verified by Devyce Labs",
+  "owner": {
+    "name": "Devyce Labs",
+    "email": "devycelabs@users.noreply.github.com"
+  },
+  "plugins": []
+}
