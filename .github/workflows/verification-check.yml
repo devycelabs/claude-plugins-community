@@ -1,0 +1,75 @@
+name: Plugin verification check
+
+on:
+  schedule:
+    - cron: '0 9 * * 1'   # Every Monday at 09:00 UTC
+  workflow_dispatch:       # Allow manual trigger
+
+jobs:
+  check-verifications:
+    runs-on: ubuntu-latest
+    permissions:
+      issues: write
+      contents: read
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Check for overdue verifications
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const registry = JSON.parse(fs.readFileSync('registry.json', 'utf8'));
+            const today = new Date();
+            const DEADLINE_DAYS = 30;
+
+            for (const plugin of registry.plugins) {
+              if (plugin.status !== 'active') continue;
+
+              const due = new Date(plugin.verificationDue);
+              if (due > today) continue;
+
+              // Check if a verification issue already exists for this plugin
+              const existing = await github.rest.issues.listForRepo({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                labels: 'verification',
+                state: 'open',
+              });
+
+              const alreadyOpen = existing.data.some(i =>
+                i.title.includes(`[VERIFY] ${plugin.name}`)
+              );
+              if (alreadyOpen) continue;
+
+              // Calculate deadline
+              const deadline = new Date(today);
+              deadline.setDate(deadline.getDate() + DEADLINE_DAYS);
+              const deadlineStr = deadline.toISOString().split('T')[0];
+
+              await github.rest.issues.create({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                title: `[VERIFY] ${plugin.name} — active status check`,
+                labels: ['verification'],
+                body: [
+                  `Hi @${plugin.author} 👋`,
+                  ``,
+                  `Your plugin **${plugin.name}** (\`${plugin.repo}\`) is listed in the claude-plugins-community registry and is due for its 6-month verification check.`,
+                  ``,
+                  `Please confirm one of the following by **${deadlineStr}** (30 days from now):`,
+                  ``,
+                  `- [ ] ✅ **Still active** — the plugin is maintained and working with the current version of Claude Code`,
+                  `- [ ] 🗄️ **Archive it** — the plugin is no longer maintained`,
+                  `- [ ] 🔀 **Transferred** — moved to a new repo (provide the new URL)`,
+                  ``,
+                  `No response by ${deadlineStr} will result in the plugin being marked as \`archived\` in the registry.`,
+                  ``,
+                  `---`,
+                  `*Part of the [6-month verification process](../blob/main/CONTRIBUTING.md#active-verification-6-month-cycle).*`,
+                ].join('\n'),
+              });
+
+              console.log(`Opened verification issue for: ${plugin.name}`);
+            }

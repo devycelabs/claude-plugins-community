@@ -1,0 +1,67 @@
+name: Update README registry table
+
+on:
+  push:
+    branches: [main]
+    paths: ['registry.json']
+  workflow_dispatch:
+
+jobs:
+  update-readme:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Regenerate registry table in README
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const registry = JSON.parse(fs.readFileSync('registry.json', 'utf8'));
+            const today = new Date();
+
+            function statusBadge(plugin) {
+              if (plugin.status === 'archived') return '🗄️ Archived';
+              const due = new Date(plugin.verificationDue);
+              if (due < today) return '⏳ Pending';
+              return '✅ Active';
+            }
+
+            let table = '';
+            if (!registry.plugins.length) {
+              table = '*No plugins listed yet. Be the first — see [CONTRIBUTING.md](CONTRIBUTING.md).*';
+            } else {
+              const rows = registry.plugins
+                .slice()
+                .sort((a, b) => a.name.localeCompare(b.name))
+                .map(p => {
+                  const tags = (p.tags || []).map(t => `\`${t}\``).join(' ');
+                  return `| [${p.name}](https://github.com/${p.repo}) | ${p.description} | [@${p.author}](https://github.com/${p.author}) | ${tags} | ${statusBadge(p)} |`;
+                })
+                .join('\n');
+
+              table = [
+                `| Plugin | Description | Author | Tags | Status |`,
+                `|--------|-------------|--------|------|--------|`,
+                rows,
+              ].join('\n');
+            }
+
+            let readme = fs.readFileSync('README.md', 'utf8');
+            readme = readme.replace(
+              /<!-- REGISTRY_TABLE_START -->[\s\S]*?<!-- REGISTRY_TABLE_END -->/,
+              `<!-- REGISTRY_TABLE_START -->\n${table}\n<!-- REGISTRY_TABLE_END -->`
+            );
+            fs.writeFileSync('README.md', readme);
+            console.log('README updated.');
+
+      - name: Commit updated README
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add README.md
+          git diff --staged --quiet || git commit -m "chore: update registry table [skip ci]"
+          git push
