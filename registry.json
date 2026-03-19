@@ -2,5 +2,19 @@
   "version": "1.0.0",
   "maintainer": "devycelabs",
   "updatedAt": "2026-03-19T00:00:00Z",
-  "plugins": []
+  "plugins": [
+    {
+      "name": "plugin-browser",
+      "displayName": "Plugin Browser",
+      "description": "Local web UI for browsing, filtering, and installing Claude Code plugins — shows install counts, update status, and community plugins.",
+      "author": "devycelabs",
+      "repo": "devycelabs/claude-plugin-browser",
+      "marketplace": "devycelabs/claude-plugin-browser",
+      "addedAt": "2026-03-19",
+      "lastVerified": "2026-03-19",
+      "verificationDue": "2026-09-19",
+      "status": "active",
+      "tags": ["productivity", "ui", "mcp"]
+    }
+  ]
 }
